@@ -12,6 +12,11 @@ Setup a virtualenv
 virtualenv company-website && cd company-website
 ```
 
+Note: As of Feb 2018, Homebrew on MacOS defaults to Python 3. Therefore you'll need to specify Python 2.7
+```
+virtualenv --python=/usr/local/bin/python2 company-website && cd company-website
+```
+
 Clone
 ```
 git clone https://github.com/OriginProtocol/company-website.git && cd company-website
@@ -60,4 +65,24 @@ To enable recaptcha, add the following environment variables to `.env`
     RECAPTCHA_SIZE = "invisible"
 
 You can get Recaptcha keys here: https://www.google.com/recaptcha/admin
+
+## Dev Deployment on Heroku
+
+To deploy a dev copy of the site on Heroku, you'll follow the normal steps you would to deploy on Heroku, with two additional steps.
+
+After the normal setup and linking, you'll need to ensure the site uses both the python and the nginx backend:
+
+	heroku buildpacks:set heroku/python
+	heroku buildpacks:add https://github.com/heroku/heroku-buildpack-nginx
+
+As a minium, you must set these three Heroku config variables:
+
+|Config          |Value|
+|----------------|------|
+|FLASK_SECRET_KEY|(make something up)|
+|PROJECTPATH     |/app|
+|HOST            |(domain name of your dev heroku app)|
+
+There are more optional config variables you can set. See [sample.env](sample.env) for a full list.
+
 

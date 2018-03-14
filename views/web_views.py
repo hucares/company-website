@@ -2,14 +2,14 @@ from collections import OrderedDict
 from datetime import datetime
 
 from flask import (jsonify, redirect, render_template,
-                   request, flash, g, url_for)
+                   request, flash, g, url_for, Response)
 from flask_babel import gettext, Babel, Locale
 from flask_recaptcha import ReCaptcha
 import os
 from app import app
-from config import constants, universal
+from config import constants, universal, partner_details
 from logic.emails import mailing_list
-from util.misc import sort_language_constants, get_real_ip
+from util.misc import sort_language_constants, get_real_ip, concat_asset_files
 
 # Translation: change path of messages.mo files
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = '../translations'
@@ -47,7 +47,6 @@ def robots():
 
 @app.route('/<lang_code>')
 def index():
-    flash('telegram')
     return render_template('index.html')
 
 @app.route('/<lang_code>/team')
@@ -81,7 +80,8 @@ def product_brief():
 @app.route('/mailing-list/join', methods=['POST'])
 def join_mailing_list():
     email = request.form['email']
-    feedback = mailing_list.send_welcome(email)
+    ip_addr = get_real_ip()
+    feedback = mailing_list.send_welcome(email, ip_addr)
     return jsonify(feedback)
 
 @app.route('/presale/join', methods=['POST'])
@@ -95,6 +95,7 @@ def join_presale():
     citizenship = request.form["citizenship"]
     sending_addr = request.form["sending_addr"]
     note = request.form["note"]
+    ip_addr = get_real_ip()
     print("CHECK:", email, request.remote_addr) # Temp until we get IP recorded
     if not full_name:
         return jsonify(gettext("Please enter your name"))
@@ -164,6 +165,29 @@ def partners_interest():
     flash(feedback)
     return jsonify("OK")
 
+@app.route('/static/css/all_styles.css')
+def assets_all_styles():
+    return Response(concat_asset_files([
+        "static/css/vendor-bootstrap-4.0.0-beta2.css",
+        "static/css/style.css",
+        "static/css/alertify.css",
+        "static/css/animate.css"
+    ]), mimetype="text/css")
+
+@app.route('/static/js/all_javascript.js')
+def assets_all_javascript():
+    return Response(concat_asset_files([
+        "static/js/vendor-jquery-3.2.1.min.js",
+        "static/js/vendor-popper.min.js",
+        "static/js/vendor-bootstrap.min.js",
+        "static/js/alertify.js",
+        "static/js/script.js",
+        "static/js/wow.min.js"
+    ]), mimetype="application/javascript")
+
+@app.context_processor
+def inject_partners():
+    return dict(partners_dict = partner_details.PARTNERS)
 
 @app.errorhandler(404)
 def page_not_found(e):

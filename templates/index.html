@@ -13,7 +13,7 @@
       <div class="row">
         <div class="col-12 col-md-6">
           <h1>
-            {% trans %}The sharing economy without intermediaries{% endtrans %}
+            {{ gettext("The sharing economy without intermediaries") }}
           </h1>
           <p>
             {{ gettext("Origin is a protocol for creating sharing economy marketplaces using the Ethereum blockchain and IPFS") }}
@@ -111,7 +111,7 @@
             <div class="col-12 col-md-6">
               <div class="card-deck">
                 <div class="partner-card">
-                  <img src="/static/img/partners/propy.png"
+                  <img src="/static/img/partners/propy-dark.png"
                     class="propy-logo">
                   <p>
                     {{ gettext("Propy is building their property manager marketplace DApp with Origin Protocol.") }}
@@ -126,8 +126,6 @@
                 </div>
                 <div class="partner-card next">
                   <img src="/static/img/partners/beetoken.png"
-                    srcset="/static/img/partners/beetoken@2x.png 2x,
-                    /static/img/partners/beetoken@3x.png 3x"
                     class="beetoken-logo">
                   <p>
                     {{ gettext("Bee Token is building a middleman free, peer-to-peer network of hosts and guests on the decentralized web using Origin Protocol.") }}
@@ -135,8 +133,6 @@
                 </div>
                 <div class="partner-card current">
                   <img src="/static/img/partners/canya.png"
-                    srcset="/static/img/partners/canya@2x.png 2x,
-                    /static/img/partners/canya@3x.png 3x"
                     class="canya-logo">
                   <p>
                     {{ gettext("CanYa is building their “marketplace of services” with Origin Protocol for the gig economy.") }}
@@ -256,7 +252,7 @@
             </div>
             <div class="col-12 col-md-5">
               <h2>
-                Features
+                {{ gettext("Features") }}
               </h2>
               <div class="row">
                 <div class="col-6">
@@ -413,7 +409,7 @@
                 <div class="col-md-2 col-xs-12 purple-to-green">
                   <div class="purple-circle"></div>
                   <div class="when">
-                    {{ gettext("March 2018") }}
+                    {{ gettext("Q2 2018") }}
                   </div>
                   {{ gettext("Public beta and community sale") }}
                 </div>
@@ -589,6 +585,11 @@
 {% endblock %}
 
 {% block extra_scripts %}
+  <script>
+    setTimeout(function() {
+      alertify.log("{{ gettext("Make new friends!") }}<div class='telegram-btn-container'><a href='{{ universal.TELEGRAM_URL }}' target='_blank'><button class='telegram-btn btn btn-primary btn-min-size'><i class='fab fa-telegram-plane'></i>{{ gettext("Join Our Telegram") }}</button></a></div>", "default", 0)
+    }, 2000);
+  </script>
   <script>
     var cards = document.querySelectorAll('.partner-card');
     var interval;
