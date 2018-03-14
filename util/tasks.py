@@ -33,3 +33,21 @@ def send_email(body):
     flask_app.logger.fatal("Sending email from Celery...")
     sg_api = sendgrid.SendGridAPIClient(apikey=constants.SENDGRID_API_KEY)
     sg_api.client.mail.send.post(request_body=body)
+
+
+@celery.task(rate_limit='300/m', max_retries=3)
+def full_contact_request(email):
+    fc = FullContact(constants.FULLCONTACT_KEY)
+    r = fc.person(email=email)
+
+    code = int(r.status_code)
+    if code == 200:
+        logic.fullcontact.fullcontact.fullcontact(email, r.json())
+    elif code == 202:
+        full_contact_request.retry(countdown=randint(MIN_RETRY_TIME, MAX_RETRY_TIME))
+    elif code == 404:
+        logic.fullcontact.fullcontact.fullcontact(email, r.json())
+    else:
+        flask_app.logger.fatal("FullContact request %s with status code %s",
+                               email, r.status_code)
+        flask_app.logger.fatal(r.json())
